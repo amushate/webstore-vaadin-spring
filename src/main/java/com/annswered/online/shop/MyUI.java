@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.annswered.online.shop.config.DataConfiguration;
+import com.annswered.online.shop.upload.UploadWithProgressMonitoringView;
 import com.annswered.online.shop.view.CartView;
 import com.annswered.online.shop.view.HomeView;
 import com.annswered.online.shop.view.LoginView;
@@ -17,6 +18,7 @@ import com.vaadin.navigator.Navigator;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -41,11 +43,11 @@ import com.vaadin.ui.themes.BaseTheme;
 public class MyUI extends UI {
 
     private static final long serialVersionUID = 1L;
-
-    static ApplicationContext context;
+    AnnotationConfigApplicationContext context=new AnnotationConfigApplicationContext(DataConfiguration.class);
     
 	@Override
     protected void init(VaadinRequest vaadinRequest) {
+		VaadinSession.getCurrent().setAttribute("context", context);
     	final VerticalLayout layout = new VerticalLayout();
     	Panel panel=new Panel();
     	
@@ -74,13 +76,14 @@ public class MyUI extends UI {
         navigator.addView("Login", LoginView.class);
         navigator.addView("Search", SearchView.class);
         navigator.addView("", HomeView.class);
+        navigator.addView("AddItem", UploadWithProgressMonitoringView.class);
         
         Embedded logo=getlogo();
         topBar.addComponent(logo);
         topBar.addComponent(new Label());
         topBar.addComponent(new Label());
         topBar.setComponentAlignment(logo, Alignment.BOTTOM_LEFT);
-        for (String c : new String[]{"Home","Products","Login","Search"}) {
+        for (String c : new String[]{"Home","Products","Login","Search","AddItem"}) {
         	Button button=this.createNavigationButton(c,navigator);
 			topBar.addComponent(button);
 			topBar.setComponentAlignment(button, Alignment.MIDDLE_CENTER);
@@ -112,24 +115,15 @@ public class MyUI extends UI {
     	Panel panel=new Panel();
     	panel.setStyleName("my-panel-header");
     	panel.setContent(footer);
-    	//final HorizontalLayout footerContainer=new HorizontalLayout();
-    	//footerContainer.addComponent(footer);
 		return panel;
 	}
 
 	private Embedded getlogo(){
-    	// A theme resource in the current theme ("mytheme")
-    	// Located in: VAADIN/themes/mytheme/img/themeimage.png
-    	//ThemeResource resource = new ThemeResource("img/ans.png");
-
-    	// Use the resource
-    	//Image image = new Image("", resource);
     	Embedded reindeerImage = new Embedded( null, new ThemeResource( "img/ans.png" ) );
     	reindeerImage.setWidth( "200px" ); 
     	reindeerImage.setHeight( "180px" );
     	
     	return reindeerImage;
-		//return image;
     	
     }
     
@@ -150,36 +144,9 @@ public class MyUI extends UI {
     	
     }
     
-    /*private ApplicationContext initDba(){
-    	ApplicationContext context=null;
-    	try(AnnotationConfigApplicationContext cxt=new AnnotationConfigApplicationContext(DataConfiguration.class)){
-    		//this.context=cxt;
-			//BookService service=context.getBean(BookService.class);
-			//Book book=new Book("First book", new Date(), 33, new BigDecimal("26.00"));
-			//service.save(book);
-			//System.out.println(book);
-		}
-    	return context;
-    }*/
-    
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
     public static class MyUIServlet extends VaadinServlet {
-		private static final long serialVersionUID = 1L;
-		//context=initDba();
-		//private ApplicationContext initDba(){
-	    	{
-	    		//ApplicationContext context=null;
-	    	
-	    	try(AnnotationConfigApplicationContext cxt=new AnnotationConfigApplicationContext(DataConfiguration.class)){
-	    		context=cxt;
-				//BookService service=context.getBean(BookService.class);
-				//Book book=new Book("First book", new Date(), 33, new BigDecimal("26.00"));
-				//service.save(book);
-				//System.out.println(book);
-			}
-	    	//return context;
-	    	}
-	   // }
+		private static final long serialVersionUID = 1L;		
     }
 }

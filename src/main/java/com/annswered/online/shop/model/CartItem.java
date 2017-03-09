@@ -35,10 +35,10 @@ public class CartItem implements Serializable{
 	private StockItem stockItem;
 	
 	@Column(name="qty")
-	private BigDecimal qty;
+	private BigDecimal qty=BigDecimal.valueOf(0, 2);
 	
 	@Column(name="total")
-	private BigDecimal total;
+	private BigDecimal total=BigDecimal.valueOf(0, 2);;
 
 	public Cart getCart() {
 		return cart;

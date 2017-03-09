@@ -41,7 +41,7 @@ public class User implements Serializable{
 	private String password;
 	
 	@OneToOne(cascade=CascadeType.ALL)
-	//@JoinColumn(name="user_id", unique=true, nullable=false, updatable=false)
+	@JoinColumn(name="cart")
 	private Cart cart;
 	
 	@Column(name="first_name")

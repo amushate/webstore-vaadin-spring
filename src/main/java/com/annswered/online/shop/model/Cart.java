@@ -35,7 +35,8 @@ public class Cart implements Serializable{
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int cartId;
 	
-	@OneToOne//(optional=false, mappedBy="cart")
+	@OneToOne
+	@JoinColumn(name="user")
 	User user;
 	
 	@OneToMany(cascade=CascadeType.ALL, mappedBy="cart")

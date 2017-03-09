@@ -1,4 +1,4 @@
-package com.annswered.online.shop.config;
+package com.annswered.online.shop.config.test;
 
 import java.util.Properties;
 
@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan("com.annswered.online")
 @PropertySource("classpath:jdbc.properties")
 @EnableAspectJAutoProxy
-public class DataConfiguration {
+public class DataConfigurationTest {
 
 	@Autowired
 	Environment evn;
@@ -39,7 +39,7 @@ public class DataConfiguration {
 		DriverManagerDataSource dataSource=new DriverManagerDataSource();
 		String username=evn.getProperty("jdbc.username");
 		String password=evn.getProperty("jdbc.password");
-		String url=evn.getProperty("jdbc.url");
+		String url=evn.getProperty("test.jdbc.url");
 		String driverClassName=evn.getProperty("jdbc.driverClassName");
 		
 		dataSource.setDriverClassName(driverClassName);
@@ -58,7 +58,7 @@ public class DataConfiguration {
 		
 		Properties jpaProperties=new Properties();
 		jpaProperties.put("showSql", evn.getProperty("showSql"));
-		jpaProperties.put("hibernate.hbm2ddl.auto", evn.getProperty("hibernate.hbm2ddl.auto"));
+		jpaProperties.put("hibernate.hbm2ddl.auto", evn.getProperty("test.hibernate.hbm2ddl.auto"));
 		jpaProperties.put("hibernate.dialect", evn.getProperty("hibernate.dialect"));//""");
 		
 		LocalContainerEntityManagerFactoryBean factory=new LocalContainerEntityManagerFactoryBean();

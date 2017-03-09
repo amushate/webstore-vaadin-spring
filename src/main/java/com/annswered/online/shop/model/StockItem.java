@@ -9,9 +9,13 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -40,20 +44,24 @@ public class StockItem implements Serializable{
 	@Column(name="price")
 	private BigDecimal price;
 	
+	@Enumerated(EnumType.STRING)
 	@Column(name="status")
 	private ItemStatus status;
 	
+	@Enumerated(EnumType.STRING)
 	@Column(name="measure")
 	private ItemMeasure measure;
 	
-	@Column(name="created_by")
+	@ManyToOne
+	@JoinColumn(name="created_by", nullable=false, updatable=false)
 	private User createdBy;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="created_date")
 	private Date createdDate;
 	
-	@Column(name="suspended_by")
+	@ManyToOne
+	@JoinColumn(name="suspended_by")
 	private User suspendedBy;
 	
 	@Temporal(TemporalType.TIMESTAMP)

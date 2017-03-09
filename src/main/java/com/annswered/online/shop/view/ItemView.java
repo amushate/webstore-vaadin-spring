@@ -5,7 +5,11 @@ package com.annswered.online.shop.view;
 
 import java.math.BigDecimal;
 
+import com.annswered.online.shop.model.Cart;
+import com.annswered.online.shop.model.CartItem;
+import com.annswered.online.shop.model.StockItem;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -22,26 +26,25 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class ItemView extends VerticalLayout {
 	
+	VaadinSession session=VaadinSession.getCurrent();
+	Cart cart=(Cart) session.getAttribute("cart");
 	private static final long serialVersionUID = 1L;
-	Label nameLabel;
 	Label priceLabel;
 	HorizontalLayout qtyAndTotal=new HorizontalLayout();
 	HorizontalLayout imageAndPrice=new HorizontalLayout();
 	
 	Embedded itemImage;
-	BigDecimal price,qty=BigDecimal.valueOf(0,2),total=BigDecimal.valueOf(0,2);
-	public ItemView(String name,BigDecimal price,String image){
-		
-		nameLabel=new Label(name);
-		priceLabel=new Label("Price<br>$"+price,ContentMode.HTML);
-		itemImage= new Embedded( null, new ThemeResource( "img/"+image+".png" ) );
+	public ItemView(CartItem cartItem){
+		StockItem stockItem = cartItem.getStockItem();
+		priceLabel=new Label("Price<br>$"+stockItem.getPrice(),ContentMode.HTML);
+		itemImage= new Embedded( null, new ThemeResource( "img/"+stockItem.getImage()) );
 		itemImage.setWidth("180px"); 
 		itemImage.setHeight("140px");
 		
 		Button subtract=new Button("-");
-		Label qtyLabel=new Label("Qty<br>"+qty,ContentMode.HTML);
+		Label qtyLabel=new Label("Qty<br>"+cartItem.getQty(),ContentMode.HTML);
 		qtyLabel.setCaptionAsHtml(true);
-		Label totalLabel=new Label("Total<br>$"+total,ContentMode.HTML);
+		Label totalLabel=new Label("Total<br>$"+cartItem.getTotal(),ContentMode.HTML);
 		totalLabel.setCaptionAsHtml(true);
 		Button add=new Button("+");
 		
@@ -49,24 +52,33 @@ public class ItemView extends VerticalLayout {
 			private static final long serialVersionUID = 1L;
 			@Override
 			public void buttonClick(ClickEvent event) {
-				if(qty.compareTo(BigDecimal.ZERO)==0){
+				if(cartItem.getQty().compareTo(BigDecimal.ZERO)==0){
+					if(itemInCart(cartItem)){
+						cart.getItems().remove(cartItem);
+					}
 					return;
 				}
-				qty=qty.subtract(BigDecimal.ONE);
-				qtyLabel.setValue("Qty<br>"+qty);
-				total=qty.multiply(price);
-				totalLabel.setValue("Total<br>$"+total);
+				cartItem.setQty(cartItem.getQty().subtract(BigDecimal.ONE));//=qty.multiply(price);
+				qtyLabel.setValue("Qty<br>"+cartItem.getQty());				
+				totalLabel.setValue("Total<br>$"+cartItem.getTotal());
+				if(cartItem.getQty().compareTo(BigDecimal.ZERO)==0){
+					if(itemInCart(cartItem)){
+						cart.getItems().remove(cartItem);
+					}
+				}
 			}
 		});
 		
 		add.addClickListener(new ClickListener() {
 			private static final long serialVersionUID = 1L;
 			@Override
-			public void buttonClick(ClickEvent event) {
-				qty=qty.add(BigDecimal.ONE);
-				qtyLabel.setValue("Qty<br>"+qty);
-				total=qty.multiply(price);				
-				totalLabel.setValue("Total<br>$"+total);				
+			public void buttonClick(ClickEvent event) {				
+				cartItem.setQty(cartItem.getQty().add(BigDecimal.ONE));//=qty.multiply(price);
+				qtyLabel.setValue("Qty<br>"+cartItem.getQty());				
+				totalLabel.setValue("Total<br>$"+cartItem.getTotal());
+				if(!itemInCart(cartItem)){
+					cart.getItems().add(cartItem);
+				}
 			}
 		});
 		Label space=new Label();
@@ -74,14 +86,26 @@ public class ItemView extends VerticalLayout {
 		imageAndPrice.addComponent(itemImage);
 		imageAndPrice.addComponent(priceLabel);
 		imageAndPrice.setComponentAlignment(priceLabel, Alignment.MIDDLE_RIGHT);
-		//layout.addComponent(priceLabel);
+
 		qtyAndTotal.addComponent(add);
 		qtyAndTotal.addComponent(subtract);
 		qtyAndTotal.addComponent(qtyLabel);
 		qtyAndTotal.addComponent(space);
 		qtyAndTotal.addComponent(totalLabel);
+		
 		addComponent(imageAndPrice);
 		addComponent(qtyAndTotal);
+	}
+	
+	private boolean itemInCart(CartItem cartItem){
+		boolean exist=false;		
+		for(CartItem incart:cart.getItems()){
+			if(incart.getStockItem().getStockitemId()==cartItem.getStockItem().getStockitemId()){
+				exist=true;
+				break;
+			}
+		}
+		return exist;			
 	}
 	
 }
